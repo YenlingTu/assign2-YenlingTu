@@ -1,15 +1,15 @@
 float lifeX=-130;
 
-float soldierX=0;
+float soldierX=-160;
 float soldierY=80*int(random(2,6));
 float soldierSpeedX=4;
 
-float cabbageX=80*int(random(0,7));
+float cabbageX=80*int(random(0,8));
 float cabbageY=80*int(random(2,6));
 
 float groundhogX=320;
 float groundhogY=80;
-float groundhogSpeed=4;
+float groundhogSpeed=80/15;
 
 final int GAME_START = 0;
 final int GAME_RUN = 1;
@@ -26,7 +26,8 @@ int gameState = GAME_START;
 boolean  downPressed, rightPressed, leftPressed;
 
 void setup() {
-	size(640, 480, P2D);
+   frameRate(60);
+  size(640, 480, P2D);
 
 //background
 bg=loadImage("img/bg.jpg");
@@ -49,6 +50,7 @@ gameover=loadImage("img/gameover.jpg");
 }
 
 void draw() {
+  frameRate(60);
   switch(gameState){
     case GAME_START:
       if(mouseX > BUTTON_LEFT && mouseX < BUTTON_RIGHT
@@ -85,16 +87,16 @@ void draw() {
       //Soldier
       image(soldier,soldierX,soldierY);
       soldierX+=soldierSpeedX;//Soldier Movement
-      soldierX%=640;//Soldier Movement 
+      if(soldierX >= 640){soldierX = -80;}//Soldier Movement 
   
     //GroundHog Movement
-      if(downPressed){
+  if(downPressed){
                   image(groundhogDown,groundhogX,groundhogY);
-                  groundhogY += groundhogSpeed;;
+                  groundhogY =groundhogY+groundhogSpeed;
                   if(groundhogY+80>height) groundhogY=height-80;
           }  else if(leftPressed){
            image(groundhogLeft,groundhogX,groundhogY);
-           groundhogX -= groundhogSpeed;
+           groundhogX =groundhogX- groundhogSpeed;
                   if(groundhogX<0)groundhogX=0;
          }   else if(rightPressed){
            image(groundhogRight,groundhogX,groundhogY);
@@ -103,20 +105,19 @@ void draw() {
          }   else{
            image(groundhog,groundhogX,groundhogY);
          }
+    
     //EatCabbage
-    if(groundhogX<cabbageX&& groundhogX+80>cabbageX && groundhogY+80>cabbageY &&groundhogY<cabbageY+80){
-        groundhogX=320;
-        groundhogY=80;
-       lifeX+=70;
+    if( groundhogX < cabbageX+80 && groundhogX+80 > cabbageX && groundhogY < cabbageY+80 && groundhogY+80 > cabbageY){
+              lifeX+=70;
        cabbageX=700;
        }
     //Crash
-    if(groundhogX<soldierX&& groundhogX+80>soldierX && groundhogY+80>soldierY &&groundhogY<soldierY+80){
-      	groundhogX=320;
+    if( groundhogX < soldierX+80&& groundhogX+80 > soldierX && groundhogY < soldierY+80 && groundhogY+80 > soldierY){
+        groundhogX=320;
         groundhogY=80;
        lifeX-=70;
        }
-	 // GameLose
+   // GameLose
      if(lifeX==-270){
        gameState=GAME_OVER;
        cabbageX=80*int(random(0,7));
@@ -130,12 +131,23 @@ void draw() {
         image(gameover,0,0);
         image(restartHovered,248,360);
         if(mousePressed){
-          gameState = GAME_START;
+          gameState = GAME_RUN;
         }
       }else{
         image(gameover,0,0);
         image(restartNormal,248,360);
       }
+      
+      // reset
+    
+      if(mousePressed){
+        soldierY = 160+80*floor(random(4));
+        cabbageX = 80*floor(random(8));
+        cabbageY = 160+80*floor(random(4));
+        gameState = GAME_RUN;
+      }
+
+
       break;
     }
   }
