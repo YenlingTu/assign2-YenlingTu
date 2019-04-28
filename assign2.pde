@@ -7,9 +7,17 @@ float soldierSpeedX=4;
 float cabbageX=80*int(random(0,8));
 float cabbageY=80*int(random(2,6));
 
-float groundhogX=320;
-float groundhogY=80;
-float groundhogSpeed=80/15;
+//moving 
+boolean idle = true;
+boolean downPressed=false;
+boolean leftPressed=false;
+boolean rightPressed=false;
+
+int groundhogX, groundhogY, groundhogSpeed;
+final int SPACING = 80;
+final int X_GROUNDHOG = 320;
+final int Y_GROUNDHOG = 80;
+
 
 final int GAME_START = 0;
 final int GAME_RUN = 1;
@@ -23,10 +31,10 @@ final int BUTTON_RIGHT =392;
 
 PImage bg,soil,cabbage,life1,life2,life3,groundhog,soldier,title,gameover,restartNormal,startHovered,startNormal,restartHovered,groundhogDown,groundhogRight,groundhogLeft;
 int gameState = GAME_START;
-boolean  downPressed, rightPressed, leftPressed;
+
 
 void setup() {
-   frameRate(60);
+
   size(640, 480, P2D);
 
 //background
@@ -47,6 +55,11 @@ groundhogDown=loadImage("img/groundhogDown.png");
 groundhogLeft=loadImage("img/groundhogLeft.png");
 groundhogRight=loadImage("img/groundhogRight.png");
 gameover=loadImage("img/gameover.jpg");
+  //groundhog
+  groundhogX = X_GROUNDHOG;
+  groundhogY = Y_GROUNDHOG;
+  groundhogSpeed = 80/16;
+
 }
 
 void draw() {
@@ -90,21 +103,63 @@ void draw() {
       if(soldierX >= 640){soldierX = -80;}//Soldier Movement 
   
     //GroundHog Movement
-  if(downPressed){
-                  image(groundhogDown,groundhogX,groundhogY);
-                  groundhogY =groundhogY+groundhogSpeed;
-                  if(groundhogY+80>height) groundhogY=height-80;
-          }  else if(leftPressed){
-           image(groundhogLeft,groundhogX,groundhogY);
-           groundhogX =groundhogX- groundhogSpeed;
-                  if(groundhogX<0)groundhogX=0;
-         }   else if(rightPressed){
-           image(groundhogRight,groundhogX,groundhogY);
-           groundhogX += groundhogSpeed;
-                   if(groundhogX+80>width) groundhogX=width-80;
-         }   else{
-           image(groundhog,groundhogX,groundhogY);
-         }
+ if(idle){
+      image(groundhog,groundhogX,groundhogY);
+    }
+    
+    if(downPressed){
+      idle = false;
+      leftPressed = false;
+      rightPressed = false;
+      image(groundhogDown,groundhogX,groundhogY);
+      groundhogY += groundhogSpeed;
+            }
+        if(groundhogY%80 == 0){
+        downPressed = false;
+        idle = true;
+         } 
+    
+    if(leftPressed){
+      idle = false;
+      downPressed = false;
+      rightPressed = false;
+      image(groundhogLeft,groundhogX,groundhogY);
+      groundhogX -= groundhogSpeed;
+      if(groundhogX%80 == 0){
+        leftPressed = false;
+        idle = true;
+      }
+    }
+    
+    if(rightPressed){
+      idle = false;
+      leftPressed = false;
+      downPressed = false;
+      image(groundhogRight,groundhogX,groundhogY);
+      groundhogX += groundhogSpeed;
+      if(groundhogX%80 == 0){
+        rightPressed = false;
+        idle = true;
+      }
+    }
+    
+    // Player boundary detection
+    if(groundhogX<0){
+      leftPressed = false;
+      idle = true;
+      groundhogX = 0;
+    }
+    if(groundhogX>width-SPACING){
+      rightPressed = false;
+      idle = true;
+      groundhogX = width-SPACING;
+    }
+    if(groundhogY>height-SPACING){
+      downPressed = false;
+      idle = true;
+      groundhogY = height-SPACING;
+    }
+
     
     //EatCabbage
     if( groundhogX < cabbageX+80 && groundhogX+80 > cabbageX && groundhogY < cabbageY+80 && groundhogY+80 > cabbageY){
@@ -144,6 +199,8 @@ void draw() {
         soldierY = 160+80*floor(random(4));
         cabbageX = 80*floor(random(8));
         cabbageY = 160+80*floor(random(4));
+        groundhogX = X_GROUNDHOG;
+        groundhogY = Y_GROUNDHOG;
         gameState = GAME_RUN;
       }
 
@@ -153,29 +210,34 @@ void draw() {
   }
   
 void keyPressed(){
-  switch(keyCode){
-    case DOWN:
-    downPressed = true;
-    break;
-    case RIGHT:
-    rightPressed = true;
-    break;
-    case LEFT:
-    leftPressed = true;
-    break;
-  }
+   if(key == CODED){
+      switch(keyCode){
+        case DOWN:
+          downPressed = true;
+          break;
+        case LEFT:
+          leftPressed = true;
+          break;
+        case RIGHT:
+          rightPressed = true;
+          break;
+      }
+    }
+
   }
 
 void keyReleased(){
-  switch(keyCode){
-    case DOWN:
-    downPressed = false;
-    break;
-    case RIGHT:
-    rightPressed = false;
-    break;
-    case LEFT:
-    leftPressed = false;
-    break;
-  }
+   if(key == CODED){
+      switch(keyCode){
+        case DOWN:
+          downPressed = true;
+          break;
+        case LEFT:
+          leftPressed = true;
+          break;
+        case RIGHT:
+          rightPressed = true;
+          break;
+      }
+}
   }
